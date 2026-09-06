@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Null's Kudos Mod</title>
+    <title>Null's Mod Status</title>
     <style>
         body {
             background-color: #121212;
@@ -27,7 +27,7 @@
         }
 
         h2 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-bottom: 20px;
             color: #bb86fc;
         }
@@ -96,34 +96,54 @@
 <body>
 
     <div class="card">
-        <h2>Kudos Limit (255)</h2>
+        <h2>TID_PARTY_MODE_TITLE</h2>
         <div class="switch-container">
-            <span>Stan:</span>
+            <span id="status-label">Ładowanie...</span>
             <label class="switch">
                 <input type="checkbox" id="toggleSwitch" onchange="sendToggle(this.checked)">
                 <span class="slider"></span>
             </label>
         </div>
 
-        <div id="alert-box">Przeładuj grę, aby zastosować!</div>
+        <div id="alert-box">Uruchamianie gry...</div>
     </div>
 
     <script>
+        const toggle = document.getElementById('toggleSwitch');
+        const statusLabel = document.getElementById('status-label');
+        const alertBox = document.getElementById('alert-box');
+
+        // Odczyt aktualnego stanu z aplikacji po załadowaniu strony
+        window.addEventListener('DOMContentLoaded', fetchStatus);
+
+        function fetchStatus() {
+            fetch('http://127.0.0.1:8888/status', { method: 'GET', mode: 'cors' })
+                .then(res => res.json())
+                .then(data => {
+                    toggle.checked = data.enabled;
+                    updateLabel(data.enabled);
+                })
+                .catch(err => {
+                    statusLabel.innerText = "Brak serwera";
+                });
+        }
+
+        function updateLabel(isEnabled) {
+            statusLabel.innerText = isEnabled ? "włączone" : "wyłączone";
+        }
+
         function sendToggle(isEnabled) {
-            const alertBox = document.getElementById('alert-box');
-            
+            updateLabel(isEnabled);
+            alertBox.innerText = "Zapisano! Uruchamianie gry...";
+            alertBox.style.display = "block";
+
             fetch(`http://127.0.0.1:8888/toggle?enabled=${isEnabled}`, {
                 method: 'GET',
                 mode: 'cors'
             })
             .then(res => res.json())
-            .then(data => {
-                alertBox.innerText = "Zapisano! Przeładuj grę.";
-                alertBox.style.display = "block";
-            })
             .catch(err => {
                 alertBox.innerText = "Błąd połączenia z aplikacją!";
-                alertBox.style.display = "block";
             });
         }
     </script>
