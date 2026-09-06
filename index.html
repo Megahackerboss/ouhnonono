@@ -6,13 +6,13 @@
     <title>Null's Mod Status</title>
     <style>
         body {
-            background-color: #121212;
+            background-color: transparent;
             color: #ffffff;
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             margin: 0;
             user-select: none;
         }
@@ -21,9 +21,10 @@
             background-color: #1e1e1e;
             padding: 24px;
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.7);
             text-align: center;
-            width: 280px;
+            width: 300px;
+            border: 1px solid #333;
         }
 
         h2 {
@@ -42,8 +43,8 @@
         .switch {
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 26px;
+            width: 54px;
+            height: 28px;
         }
 
         .switch input {
@@ -58,14 +59,14 @@
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: #424242;
             transition: .3s;
-            border-radius: 26px;
+            border-radius: 28px;
         }
 
         .slider:before {
             position: absolute;
             content: "";
-            height: 18px;
-            width: 18px;
+            height: 20px;
+            width: 20px;
             left: 4px;
             bottom: 4px;
             background-color: white;
@@ -78,18 +79,18 @@
         }
 
         input:checked + .slider:before {
-            transform: translateX(24px);
+            transform: translateX(26px);
         }
 
         #alert-box {
             display: none;
-            margin-top: 12px;
+            margin-top: 14px;
             padding: 8px;
             font-size: 0.85rem;
             border-radius: 6px;
-            background-color: #332940;
-            color: #bb86fc;
-            border: 1px solid #bb86fc;
+            background-color: #2b213a;
+            color: #03dac6;
+            border: 1px solid #03dac6;
         }
     </style>
 </head>
@@ -98,14 +99,14 @@
     <div class="card">
         <h2>TID_PARTY_MODE_TITLE</h2>
         <div class="switch-container">
-            <span id="status-label">Ładowanie...</span>
+            <span id="status-label">Łączenie...</span>
             <label class="switch">
                 <input type="checkbox" id="toggleSwitch" onchange="sendToggle(this.checked)">
                 <span class="slider"></span>
             </label>
         </div>
 
-        <div id="alert-box">Uruchamianie gry...</div>
+        <div id="alert-box">Zapisano! Zamknij [X] i zrestartuj grę.</div>
     </div>
 
     <script>
@@ -113,7 +114,6 @@
         const statusLabel = document.getElementById('status-label');
         const alertBox = document.getElementById('alert-box');
 
-        // Odczyt aktualnego stanu z aplikacji po załadowaniu strony
         window.addEventListener('DOMContentLoaded', fetchStatus);
 
         function fetchStatus() {
@@ -121,20 +121,15 @@
                 .then(res => res.json())
                 .then(data => {
                     toggle.checked = data.enabled;
-                    updateLabel(data.enabled);
+                    statusLabel.innerText = data.enabled ? "włączone" : "wyłączone";
                 })
                 .catch(err => {
                     statusLabel.innerText = "Brak serwera";
                 });
         }
 
-        function updateLabel(isEnabled) {
-            statusLabel.innerText = isEnabled ? "włączone" : "wyłączone";
-        }
-
         function sendToggle(isEnabled) {
-            updateLabel(isEnabled);
-            alertBox.innerText = "Zapisano! Uruchamianie gry...";
+            statusLabel.innerText = isEnabled ? "włączone" : "wyłączone";
             alertBox.style.display = "block";
 
             fetch(`http://127.0.0.1:8888/toggle?enabled=${isEnabled}`, {
@@ -143,7 +138,7 @@
             })
             .then(res => res.json())
             .catch(err => {
-                alertBox.innerText = "Błąd połączenia z aplikacją!";
+                alertBox.innerText = "Błąd zapisu!";
             });
         }
     </script>
