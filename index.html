@@ -106,7 +106,7 @@
             </label>
         </div>
 
-        <div id="alert-box">Zapisano! Zamknij [X] i zrestartuj grę.</div>
+        <div id="alert-box">Ładowanie...</div>
     </div>
 
     <script>
@@ -131,12 +131,20 @@
         function sendToggle(isEnabled) {
             statusLabel.innerText = isEnabled ? "włączone" : "wyłączone";
             alertBox.style.display = "block";
+            alertBox.innerText = "Zapisywanie...";
 
             fetch(`http://127.0.0.1:8888/toggle?enabled=${isEnabled}`, {
                 method: 'GET',
                 mode: 'cors'
             })
             .then(res => res.json())
+            .then(data => {
+                if (data.hasRoot) {
+                    alertBox.innerText = "Restartowanie gry (Root)...";
+                } else {
+                    alertBox.innerText = "Zapisano! Zamknij [X] i zrestartuj grę.";
+                }
+            })
             .catch(err => {
                 alertBox.innerText = "Błąd zapisu!";
             });
